@@ -1,0 +1,72 @@
+Comparative Analysis For Cpu Scheduling algorithms
+class Process:
+    def __init__(self, pid, burst_time):
+        self.pid = pid
+        self.burst_time = burst_time
+        self.waiting_time = 0
+        self.turnaround_time = 0
+def fcfs(processes):
+    waiting_time = 0
+    for i in range(len(processes)):
+        processes[i].waiting_time = waiting_time
+        waiting_time += processes[i].burst_time
+        processes[i].turnaround_time = processes[i].waiting_time + processes[i].burst_time
+def sjn(processes):
+    processes.sort(key=lambda x: x.burst_time)
+    fcfs(processes)
+def round_robin(processes, quantum):
+    n = len(processes)
+    remaining_burst_time = [p.burst_time for p in processes]
+    waiting_time = [0] * n
+    t = 0
+    while True:
+        done = True
+        for i in range(n):
+            if remaining_burst_time[i] > 0:
+                done = False
+                if remaining_burst_time[i] > quantum:
+                    t += quantum
+                    remaining_burst_time[i] -= quantum
+                else:
+                    t += remaining_burst_time[i]
+                    waiting_time[i] = t - processes[i].burst_time
+                    remaining_burst_time[i] = 0
+        if done:
+            break
+    for i in range(n):
+        processes[i].waiting_time = waiting_time[i]
+        processes[i].turnaround_time = processes[i].waiting_time + processes[i].burst_time
+def average_times(processes):
+    total_waiting_time = sum(p.waiting_time for p in processes)
+    total_turnaround_time = sum(p.turnaround_time for p in processes)
+    n = len(processes)
+    print(f"Average Waiting Time: {total_waiting_time / n:.2f}")
+    print(f"Average Turnaround Time: {total_turnaround_time / n:.2f}")
+def main():
+    processes = [
+        Process(1, 10),
+        Process(2, 5),
+        Process(3, 8)
+    ]
+    print("FCFS Scheduling:")
+    fcfs(processes)
+    average_times(processes)
+    processes = [
+        Process(1, 10),
+        Process(2, 5),
+        Process(3, 8)
+    ]  
+    print("\nSJN Scheduling:")
+    sjn(processes)
+    average_times(processes)
+    processes = [
+        Process(1, 10),
+        Process(2, 5),
+        Process(3, 8)
+    ]
+    quantum = 4
+    print(f"\nRound Robin Scheduling (Quantum = {quantum}):")
+    round_robin(processes, quantum)
+    average_times(processes)
+if __name__ == "__main__":
+    main()
