@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void scan(int request[], int n, int head, int direction, int diskSize) {
+    int totalSeek = 0;
+    int distance;
+    int temp;
+
+    // Sort the request array
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 0; j < n - i - 1; j++)
+            if (request[j] > request[j + 1]) {
+                temp = request[j];
+                request[j] = request[j + 1];
+                request[j + 1] = temp;
+            }
+
+    int index;
+    for (int i = 0; i < n; i++) {
+        if (head < request[i]) {
+            index = i;
+            break;
+        }
+    }
+
+    printf("Seek Sequence:\n");
+
+    // If direction is 1 (toward higher track numbers)
+    if (direction == 1) {
+        for (int i = index; i < n; i++) {
+            printf("Move from %d to %d\n", head, request[i]);
+            totalSeek += abs(request[i] - head);
+            head = request[i];
+        }
+        // Go to end of the disk
+        printf("Move from %d to %d (end)\n", head, diskSize - 1);
+        totalSeek += abs((diskSize - 1) - head);
+        head = diskSize - 1;
+
+        for (int i = index - 1; i >= 0; i--) {
+            printf("Move from %d to %d\n", head, request[i]);
+            totalSeek += abs(request[i] - head);
+            head = request[i];
+        }
+
+    // If direction is 0 (toward lower track numbers)
+    } else {
+        for (int i = index - 1; i >= 0; i--) {
+            printf("Move from %d to %d\n", head, request[i]);
+            totalSeek += abs(request[i] - head);
+            head = request[i];
+        }
+        // Go to beginning of the disk
+        printf("Move from %d to 0 (start)\n", head);
+        totalSeek += head;
+        head = 0;
+
+        for (int i = index; i < n; i++) {
+            printf("Move from %d to %d\n", head, request[i]);
+            totalSeek += abs(request[i] - head);
+            head = request[i];
+        }
+    }
+
+    printf("\nTotal Seek Time: %d\n", totalSeek);
+    printf("Average Seek Time: %.2f\n", (float)totalSeek / n);
+}
+
+int main() {
+    int request[100], n, head, direction, diskSize;
+
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &n);
+
+    printf("Enter the disk request sequence:\n");
+    for (int i = 0; i < n; i++)
+        scanf("%d", &request[i]);
+
+    printf("Enter the initial head position: ");
+    scanf("%d", &head);
+
+    printf("Enter the total disk size (e.g., 200): ");
+    scanf("%d", &diskSize);
+
+    printf("Enter the direction (1 for up/toward higher track numbers, 0 for down): ");
+    scanf("%d", &direction);
+
+    scan(request, n, head, direction, diskSize);
+
+    return 0;
+}
