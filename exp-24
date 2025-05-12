@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_FILES 100
+#define NAME_LENGTH 100
+
+struct File {
+    char name[NAME_LENGTH];
+};
+
+struct Directory {
+    struct File files[MAX_FILES];
+    int count;
+};
+void createFile(struct Directory *dir, const char *name) {
+    if (dir->count >= MAX_FILES) {
+        printf("Directory is full.\n");
+        return;
+    }
+
+    for (int i = 0; i < dir->count; i++) {
+        if (strcmp(dir->files[i].name, name) == 0) {
+            printf("File '%s' already exists.\n", name);
+            return;
+        }
+    }
+
+    strcpy(dir->files[dir->count].name, name);
+    dir->count++;
+    printf("File '%s' created.\n", name);
+}
+void deleteFile(struct Directory *dir, const char *name) {
+    for (int i = 0; i < dir->count; i++) {
+        if (strcmp(dir->files[i].name, name) == 0) {
+            for (int j = i; j < dir->count - 1; j++) {
+                dir->files[j] = dir->files[j + 1];
+            }
+            dir->count--;
+            printf("File '%s' deleted.\n", name);
+            return;
+        }
+    }
+    printf("File '%s' not found.\n", name);
+}
+void listFiles(const struct Directory *dir) {
+    if (dir->count == 0) {
+        printf("Directory is empty.\n");
+        return;
+    }
+
+    printf("Files in directory:\n");
+    for (int i = 0; i < dir->count; i++) {
+        printf("- %s\n", dir->files[i].name);
+    }
+}
+
+int main() {
+    struct Directory dir = {.count = 0};
+    int choice;
+    char name[NAME_LENGTH];
+
+    while (1) {
+        printf("\n1. Create File\n2. Delete File\n3. List Files\n4. Exit\nChoose an option: ");
+        scanf("%d", &choice);
+        getchar(); 
+        switch (choice) {
+            case 1:
+                printf("Enter file name to create: ");
+                fgets(name, NAME_LENGTH, stdin);
+                name[strcspn(name, "\n")] = '\0'; 
+                createFile(&dir, name);
+                break;
+
+            case 2:
+                printf("Enter file name to delete: ");
+                fgets(name, NAME_LENGTH, stdin);
+                name[strcspn(name, "\n")] = '\0';
+                deleteFile(&dir, name);
+                break;
+
+            case 3:
+                listFiles(&dir);
+                break;
+
+            case 4:
+                return 0;
+
+            default:
+                printf("Invalid option.\n");
+        }
+    }
+
+    return 0;
+}
