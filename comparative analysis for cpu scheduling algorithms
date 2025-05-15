@@ -1,4 +1,4 @@
-Comparative Analysis For Cpu Scheduling algorithms
+Adaptive cpu scheduling for high performance computing
 class Process:
     def __init__(self, pid, burst_time):
         self.pid = pid
